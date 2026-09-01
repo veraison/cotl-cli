@@ -14,7 +14,7 @@ import (
 	"time"
 
 	"github.com/veraison/corim/corim"
-	"github.com/veraison/cotl"
+	"github.com/veraison/corim/cotl"
 	cose "github.com/veraison/go-cose"
 	"github.com/veraison/swid"
 )
@@ -242,13 +242,18 @@ func rimWrap(args []string) error {
 		return err
 	}
 
+	var corimTag corim.Tag
+	if err := corimTag.UnmarshalCBOR(tagCBOR); err != nil {
+		return fmt.Errorf("wrapping CoTL tag failed: %w", err)
+	}
+
 	unsigned := corim.UnsignedCorim{
 		ID:   *swid.NewTagID(*id),
-		Tags: []corim.Tag{tagCBOR},
+		Tags: []corim.Tag{corimTag},
 	}
 
 	if *profile != "" {
-		unsigned.AddProfile(*profile)
+		unsigned.SetProfile(*profile)
 	}
 
 	buf, err := unsigned.ToCBOR()
@@ -401,9 +406,14 @@ func rimShow(args []string) error {
 	fmt.Printf("tags:      %d\n", len(unsigned.Tags))
 
 	for i, t := range unsigned.Tags {
-		tag, err := cotl.NewConciseTlTagFromCBOR(t)
+		if t.Number != cotl.CotlTag {
+			fmt.Printf("  [tag %d] (%d bytes, not a CoTL)\n", i, len(t.Content))
+			continue
+		}
+
+		tag, err := cotl.NewConciseTlTagFromCBOR(t.Content)
 		if err != nil {
-			fmt.Printf("  [tag %d] (%d bytes, not a CoTL)\n", i, len(t))
+			fmt.Printf("  [tag %d] (%d bytes, not a CoTL)\n", i, len(t.Content))
 			continue
 		}
 		fmt.Println("  [CoTL]")

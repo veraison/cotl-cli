@@ -4,9 +4,8 @@ Go command-line tool for working with **Concise Tag Lists (CoTLs)** and
 **Concise Reference Integrity Manifests (CoRIMs)** per
 [draft-ietf-rats-corim-11](https://datatracker.ietf.org/doc/draft-ietf-rats-corim/).
 
-Built on [veraison/corim](https://github.com/veraison/corim),
-[veraison/go-cose](https://github.com/veraison/go-cose), and the sibling
-[veraison/cotl](../cotl) library.
+Built on [veraison/corim](https://github.com/veraison/corim) (which provides
+the `corim/cotl` package) and [veraison/go-cose](https://github.com/veraison/go-cose).
 
 A Rust implementation of the same tool exists at [`../cotlme`](../cotlme); the
 two are byte-compatible and continuously cross-verified by interop tests.
